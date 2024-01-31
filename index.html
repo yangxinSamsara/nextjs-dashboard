@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>视频播放器</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      input {
+        margin-bottom: 10px;
+        padding: 5px;
+        width: 300px;
+      }
+
+      #videoPlayer {
+        width: 375px;
+        max-width: 375px;
+        height: fit-content;
+        aspect-ratio: 9 / 16;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="videoForm">
+      <label for="videoId">视频URL：</label>
+      <input
+        type="text"
+        id="videoId"
+        placeholder="输入在线视频的URL"
+        required
+      />
+      <button type="button" onclick="playVideo()">播放视频</button>
+    </form>
+
+    <video id="videoPlayer" onended="playNextVideo()" controls>
+      您的浏览器不支持视频播放。
+    </video>
+
+    <script>
+      let currentVideoId = 0;
+
+      const localId = localStorage.getItem('currentVideoId');
+      const input = document.getElementById('videoId');
+
+      if (localId) {
+        input.value = localId;
+      }
+      function playVideo() {
+        const videoId = input.value;
+        localStorage.setItem('currentVideoId', videoId);
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        // 构建视频URL
+        const videoUrl = `https://oss-huyu0.vmoviercdn.com/jzss/${videoId}.mp4`;
+
+        // 设置视频源
+        videoPlayer.src = videoUrl;
+
+        // 重新加载视频
+        videoPlayer.load();
+
+        // 播放视频
+        videoPlayer.play();
+
+        // 更新当前视频ID
+        currentVideoId = parseInt(videoId);
+      }
+
+      function playNextVideo() {
+        // 在视频结束时自动播放下一集
+        currentVideoId++;
+
+        const videoPlayer = document.getElementById('videoPlayer');
+        const nextVideoUrl = `https://oss-huyu0.vmoviercdn.com/jzss/${currentVideoId}.mp4`;
+
+        // 设置下一集的视频源
+        videoPlayer.src = nextVideoUrl;
+
+        // 重新加载并播放下一集
+        videoPlayer.load();
+        videoPlayer.play();
+        input.value = currentVideoId;
+        localStorage.setItem('currentVideoId', currentVideoId);
+      }
+    </script>
+  </body>
+</html>
